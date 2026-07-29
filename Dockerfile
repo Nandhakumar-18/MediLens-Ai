@@ -22,7 +22,8 @@ RUN pip install --no-cache-dir \
     Pillow==10.3.0 \
     pypdf==4.2.0 \
     fpdf2==2.7.9 \
-    waitress==3.0.0
+    waitress==3.0.0 \
+    qrcode==7.4.2
 
 # Copy application source code
 COPY . /app
