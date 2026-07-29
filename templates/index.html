@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}MediLensAI — Upload Report{% endblock %}
+
+{% block content %}
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<div class="hero fade-in">
+  <h1 class="hero-title">Personal Health Intelligence</h1>
+  <p class="hero-sub">
+    Upload your medical report and receive instant AI-powered risk analysis,
+    personalised recommendations, and voice-guided insights — completely offline.
+  </p>
+</div>
+
+<!-- ── Stats row ─────────────────────────────────────────────────────────── -->
+<div class="stats-grid stagger">
+  <div class="stat-card">
+    <div class="stat-icon cyan">📋</div>
+    <div>
+      <div class="stat-value">{{ stats.total_reports }}</div>
+      <div class="stat-label">Reports Analysed</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber">🔔</div>
+    <div>
+      <div class="stat-value">{{ stats.unread_alerts }}</div>
+      <div class="stat-label">Unread Alerts</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">⚠️</div>
+    <div>
+      <div class="stat-value">{{ stats.high_risk_count }}</div>
+      <div class="stat-label">High-Risk Reports</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">🛡️</div>
+    <div>
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Offline & Private</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Upload form ────────────────────────────────────────────────────────── -->
+<div class="card fade-in" style="max-width:780px; margin: 0 auto 40px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+    <h2 class="section-title" style="margin-bottom: 0;">📤 Upload Medical Report</h2>
+    {% if session.get('role') in ('patient', 'user') %}
+      <span style="font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; background: rgba(0, 212, 255, 0.12); border: 1px solid var(--border-accent); color: var(--cyan);">
+        👤 Daily Quota: {{ today_count if today_count is not none else 0 }} / 5 Uploads Today
+      </span>
+    {% else %}
+      <span style="font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.4); color: #c084fc;">
+        🩺 Doctor / Org Account: Unlimited Uploads
+      </span>
+    {% endif %}
+  </div>
+
+  <form id="upload-form" method="POST" action="{{ url_for('upload') }}"
+        enctype="multipart/form-data">
+
+    <!-- Drop zone -->
+    <div class="upload-zone" id="upload-zone">
+      <span class="upload-icon">🗂️</span>
+      <p class="upload-title">Drag &amp; Drop your report here</p>
+      <p class="upload-sub">or click to browse from your device</p>
+      <div class="upload-types">
+        <span class="file-type-chip">PNG</span>
+        <span class="file-type-chip">JPG</span>
+        <span class="file-type-chip">PDF</span>
+        <span class="file-type-chip">TIFF</span>
+      </div>
+      <input type="file" id="file-input" name="file"
+             accept=".png,.jpg,.jpeg,.pdf,.tiff,.bmp,.webp" hidden/>
+    </div>
+
+    <div class="file-preview" id="file-preview" style="display:none">
+      <div class="file-info">
+        <span class="file-name" id="file-name">filename.pdf</span>
+        <span class="file-size" id="file-size">0 KB</span>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-change-file">Change</button>
+    </div>
+
+    <!-- Diagnostic Mode Selector -->
+    <div style="margin-bottom: 20px;">
+      <label class="form-label" style="color: var(--cyan); font-weight: 700;">🔬 Diagnostic Engine Mode</label>
+      <select class="form-select" id="report_type" name="report_type" style="border: 1px solid var(--border-accent); background: rgba(0, 212, 255, 0.08); font-weight: 600;">
+        <option value="lab_report">🧪 Blood / Lab Test Report (Tesseract OCR Engine)</option>
+        <option value="ecg">🫀 ECG Waveform &amp; Cardiac Rhythm Analysis (Computer Vision Engine)</option>
+        <option value="xray">🩻 Chest X-Ray Infiltrate &amp; Opacity Inspection (Computer Vision Engine)</option>
+        <option value="skin">🔍 Dermatology Skin Lesion &amp; Nevus Inspection (Computer Vision Engine)</option>
+      </select>
+    </div>
+
+    <!-- Optional Patient metadata -->
+    <div class="grid-3" style="margin-bottom:20px; margin-top:20px;">
+      <div class="form-group">
+        <label class="form-label" for="patient_name">Patient Name</label>
+        <input class="form-input" type="text" id="patient_name"
+               name="patient_name" placeholder="e.g. {{ session.get('username', 'Patient Name') }}"
+               value="{% if session.get('role') in ('patient', 'user') %}{{ session.get('username', '') }}{% endif %}"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="patient_age">Age</label>
+        <input class="form-input" type="number" id="patient_age"
+               name="patient_age" placeholder="e.g. 28" min="0" max="120"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="patient_gender">Gender</label>
+        <select class="form-select" id="patient_gender" name="patient_gender">
+          <option value="Unknown">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px;">
+      🔍 &nbsp; Analyse Report
+    </button>
+  </form>
+</div>
+
+<!-- ── How it works ───────────────────────────────────────────────────────── -->
+<div class="card fade-in" style="margin-bottom:40px;">
+  <h2 class="section-title">⚙️ How It Works</h2>
+  <div class="grid-3" style="text-align:center; gap:24px;">
+    <div>
+      <div style="font-size:40px; margin-bottom:12px;">📤</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:6px;">1. Upload</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">
+        Upload any medical report image or PDF — processed entirely on your device.
+      </p>
+    </div>
+    <div>
+      <div style="font-size:40px; margin-bottom:12px;">🔍</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:6px;">2. OCR Analysis</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">
+        Tesseract OCR extracts values. Our engine classifies each parameter's risk level.
+      </p>
+    </div>
+    <div>
+      <div style="font-size:40px; margin-bottom:12px;">📊</div>
+      <h3 style="font-size:15px; font-weight:700; margin-bottom:6px;">3. Insights</h3>
+      <p style="font-size:13px; color:var(--text-secondary);">
+        View interactive charts, personalised recommendations, and voice-guided summaries.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Recent Reports ─────────────────────────────────────────────────────── -->
+{% if recent_reports %}
+<div class="card fade-in">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+    <h2 class="section-title" style="margin-bottom:0;">📋 Recent Reports</h2>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-sm">View All</a>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Age / Gender</th>
+          <th>Date</th>
+          <th>Risk Level</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent_reports %}
+        <tr>
+          <td><strong>{{ r.patient_name }}</strong></td>
+          <td>{{ r.patient_age }} / {{ r.patient_gender }}</td>
+          <td style="color:var(--text-muted); font-size:12px;">{{ r.upload_date }}</td>
+          <td>
+            {% set lvl = r.overall_risk_level | lower | replace(' ', '-') %}
+            <span class="badge badge-{{ lvl }}">{{ r.overall_risk_level }}</span>
+          </td>
+          <td>
+            <a href="{{ url_for('dashboard', report_id=r.id) }}"
+               class="btn btn-secondary btn-sm">View →</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

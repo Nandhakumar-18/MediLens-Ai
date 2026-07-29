@@ -1,0 +1,188 @@
+class RiskPredictor:
+    """
+    Rule-based health risk predictor.
+    Analyses extracted OCR values against clinical reference ranges and
+    returns a risk level (Normal / Low / Moderate / High / Critical)
+    and a numeric risk score (0–4) for each parameter.
+    """
+
+    PARAMETERS = {
+        'blood_sugar': {
+            'display_name': 'Blood Sugar (Fasting)',
+            'unit': 'mg/dL',
+            'normal_min': 70,
+            'normal_max': 100,
+            'icon': '🩸',
+            'ranges': [
+                (0,    70,           'Low',      2),
+                (70,   100,          'Normal',   0),
+                (100,  126,          'Moderate', 2),
+                (126,  200,          'High',     3),
+                (200,  float('inf'), 'Critical', 4),
+            ],
+        },
+        'hemoglobin': {
+            'display_name': 'Hemoglobin',
+            'unit': 'g/dL',
+            'normal_min': 12.0,
+            'normal_max': 17.5,
+            'icon': '💉',
+            'ranges': [
+                (0,    8.0,          'Critical Low', 4),
+                (8.0,  10.0,         'Low',          3),
+                (10.0, 12.0,         'Low',          2),
+                (12.0, 17.5,         'Normal',       0),
+                (17.5, float('inf'), 'High',         2),
+            ],
+        },
+        'cholesterol': {
+            'display_name': 'Total Cholesterol',
+            'unit': 'mg/dL',
+            'normal_min': 0,
+            'normal_max': 200,
+            'icon': '🫀',
+            'ranges': [
+                (0,   200,          'Normal',   0),
+                (200, 240,          'Moderate', 2),
+                (240, float('inf'), 'High',     3),
+            ],
+        },
+        'systolic_bp': {
+            'display_name': 'Systolic Blood Pressure',
+            'unit': 'mmHg',
+            'normal_min': 90,
+            'normal_max': 120,
+            'icon': '💓',
+            'ranges': [
+                (0,   90,           'Low',      1),
+                (90,  120,          'Normal',   0),
+                (120, 130,          'Moderate', 1),
+                (130, 140,          'Moderate', 2),
+                (140, 180,          'High',     3),
+                (180, float('inf'), 'Critical', 4),
+            ],
+        },
+        'diastolic_bp': {
+            'display_name': 'Diastolic Blood Pressure',
+            'unit': 'mmHg',
+            'normal_min': 60,
+            'normal_max': 80,
+            'icon': '💗',
+            'ranges': [
+                (0,   60,           'Low',      1),
+                (60,  80,           'Normal',   0),
+                (80,  90,           'Moderate', 2),
+                (90,  120,          'High',     3),
+                (120, float('inf'), 'Critical', 4),
+            ],
+        },
+        'wbc': {
+            'display_name': 'WBC Count',
+            'unit': 'cells/μL',
+            'normal_min': 4500,
+            'normal_max': 11000,
+            'icon': '🦠',
+            'ranges': [
+                (0,     4500,          'Low',      2),
+                (4500,  11000,         'Normal',   0),
+                (11000, 15000,         'Moderate', 2),
+                (15000, float('inf'),  'High',     3),
+            ],
+        },
+        'rbc': {
+            'display_name': 'RBC Count',
+            'unit': 'million/μL',
+            'normal_min': 4.0,
+            'normal_max': 5.5,
+            'icon': '🔴',
+            'ranges': [
+                (0,   3.5,          'Low',      3),
+                (3.5, 4.0,          'Low',      2),
+                (4.0, 5.5,          'Normal',   0),
+                (5.5, float('inf'), 'High',     2),
+            ],
+        },
+        'creatinine': {
+            'display_name': 'Creatinine',
+            'unit': 'mg/dL',
+            'normal_min': 0.6,
+            'normal_max': 1.3,
+            'icon': '🫘',
+            'ranges': [
+                (0,   0.6,          'Low',      1),
+                (0.6, 1.3,          'Normal',   0),
+                (1.3, 1.8,          'Moderate', 2),
+                (1.8, 3.0,          'High',     3),
+                (3.0, float('inf'), 'Critical', 4),
+            ],
+        },
+        'urea': {
+            'display_name': 'Blood Urea',
+            'unit': 'mg/dL',
+            'normal_min': 15,
+            'normal_max': 45,
+            'icon': '🧪',
+            'ranges': [
+                (0,  15,           'Low',      1),
+                (15, 45,           'Normal',   0),
+                (45, 60,           'Moderate', 2),
+                (60, float('inf'), 'High',     3),
+            ],
+        },
+        'uric_acid': {
+            'display_name': 'Uric Acid',
+            'unit': 'mg/dL',
+            'normal_min': 2.4,
+            'normal_max': 7.0,
+            'icon': '⚗️',
+            'ranges': [
+                (0,   2.4,          'Low',      1),
+                (2.4, 7.0,          'Normal',   0),
+                (7.0, float('inf'), 'High',     3),
+            ],
+        },
+    }
+
+    def _classify(self, param_name: str, value: float):
+        ranges = self.PARAMETERS[param_name]['ranges']
+        for lo, hi, level, score in ranges:
+            if lo <= value < hi:
+                return level, score
+        return 'Unknown', 0
+
+    def predict(self, extracted: dict) -> list:
+        results = []
+        for name, info in self.PARAMETERS.items():
+            value = extracted.get(name)
+            entry = {
+                'name': name,
+                'display_name': info['display_name'],
+                'unit': info['unit'],
+                'normal_min': info['normal_min'],
+                'normal_max': info['normal_max'],
+                'icon': info['icon'],
+                'value': value,
+                'risk_level': 'Not Detected',
+                'risk_score': 0,
+            }
+            if value is not None:
+                level, score = self._classify(name, value)
+                entry['risk_level'] = level
+                entry['risk_score'] = score
+            results.append(entry)
+        return results
+
+    def overall_risk(self, results: list) -> tuple:
+        detected = [r for r in results if r['value'] is not None]
+        if not detected:
+            return 'Unknown', 0.0
+        scores = [r['risk_score'] for r in detected]
+        avg = sum(scores) / len(scores)
+        mx  = max(scores)
+        if mx >= 4 or avg >= 3:
+            return 'Critical', round(avg, 2)
+        if mx >= 3 or avg >= 2:
+            return 'High', round(avg, 2)
+        if avg >= 1:
+            return 'Moderate', round(avg, 2)
+        return 'Normal', round(avg, 2)

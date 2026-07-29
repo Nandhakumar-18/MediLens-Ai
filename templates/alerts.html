@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Health Alerts | MediLensAI{% endblock %}
+
+{% block content %}
+<div class="topbar fade-in">
+  <div>
+    <h1 class="page-title">🔔 Health Alerts</h1>
+    <p class="page-subtitle">
+      Offline SMS-simulated notifications for abnormal health values
+      {% if unread_count > 0 %}
+        &nbsp;·&nbsp; <span style="color:var(--red); font-weight:700;">{{ unread_count }} unread</span>
+      {% endif %}
+    </p>
+  </div>
+  <a href="{{ url_for('index') }}" class="btn btn-primary">+ New Report</a>
+</div>
+
+<!-- ── SMS simulation notice ──────────────────────────────────────────────── -->
+<div class="card fade-in" style="margin-bottom:24px;
+     background:rgba(16,185,129,0.06); border-color:rgba(16,185,129,0.2);">
+  <div style="display:flex; align-items:center; gap:14px;">
+    <div style="font-size:32px;">📱</div>
+    <div>
+      <div style="font-weight:700; margin-bottom:4px; color:var(--green);">
+        Offline SMS Alert Simulation
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">
+        All critical and high-risk alerts are logged here as simulated SMS notifications.
+        No internet or external gateway is required — everything is stored locally on your device.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Alert summary stats ─────────────────────────────────────────────────── -->
+<div class="stats-grid stagger" style="margin-bottom:28px;">
+  {% set critical_count  = alerts | selectattr('severity','equalto','Critical') | list | length %}
+  {% set high_count      = alerts | selectattr('severity','equalto','High')     | list | length %}
+  {% set moderate_count  = alerts | selectattr('severity','equalto','Moderate') | list | length %}
+  {% set total           = alerts | length %}
+  <div class="stat-card">
+    <div class="stat-icon red">🚨</div>
+    <div><div class="stat-value">{{ critical_count }}</div><div class="stat-label">Critical</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber">⚠️</div>
+    <div><div class="stat-value">{{ high_count }}</div><div class="stat-label">High</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber">🔶</div>
+    <div><div class="stat-value">{{ moderate_count }}</div><div class="stat-label">Moderate</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon cyan">📋</div>
+    <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total Alerts</div></div>
+  </div>
+</div>
+
+<!-- ── Alert list ──────────────────────────────────────────────────────────── -->
+{% if alerts %}
+
+<!-- Filter buttons -->
+<div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+  <button class="btn btn-secondary btn-sm active-filter" id="filter-all"
+          onclick="filterAlerts('all', this)">All ({{ total }})</button>
+  <button class="btn btn-secondary btn-sm" id="filter-critical"
+          onclick="filterAlerts('critical', this)">🚨 Critical ({{ critical_count }})</button>
+  <button class="btn btn-secondary btn-sm" id="filter-high"
+          onclick="filterAlerts('high', this)">⚠️ High ({{ high_count }})</button>
+  <button class="btn btn-secondary btn-sm" id="filter-moderate"
+          onclick="filterAlerts('moderate', this)">🔶 Moderate ({{ moderate_count }})</button>
+</div>
+
+<div id="alerts-list">
+  {% for alert in alerts %}
+  <div class="alert-card severity-{{ alert.severity | lower }} fade-in"
+       id="alert-{{ alert.id }}"
+       data-severity="{{ alert.severity | lower }}">
+    <div class="alert-icon">
+      {% if alert.severity == 'Critical' %}🚨
+      {% elif alert.severity == 'High' %}⚠️
+      {% elif alert.severity == 'Moderate' %}🔶
+      {% else %}🔵{% endif %}
+    </div>
+    <div style="flex:1;">
+      <div class="alert-message">{{ alert.message }}</div>
+      <div class="alert-meta" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:6px;">
+        <span>👤 {{ alert.patient_name }}</span>
+        <span style="color:var(--text-muted);">·</span>
+        <span>{{ alert.timestamp }}</span>
+        {% if alert.sms_simulated %}
+        <span class="sms-badge">📱 SMS Logged</span>
+        {% endif %}
+        <span class="badge badge-{{ alert.severity | lower | replace(' ','-') }}"
+              style="font-size:10px; padding:2px 8px;">
+          {{ alert.severity }}
+        </span>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+      <a href="{{ url_for('dashboard', report_id=alert.report_id) }}"
+         class="btn btn-secondary btn-sm">View Report</a>
+      <button class="btn btn-danger btn-sm"
+              onclick="dismissAlert({{ alert.id }}, this)">Dismiss</button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% else %}
+<div class="card fade-in">
+  <div class="empty-state">
+    <div class="empty-icon">✅</div>
+    <p>No active alerts. All health parameters appear to be within normal ranges.</p>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterAlerts(level, btn) {
+  document.querySelectorAll('.active-filter').forEach(b => b.classList.remove('active-filter'));
+  btn.classList.add('active-filter');
+
+  document.querySelectorAll('#alerts-list .alert-card').forEach(card => {
+    card.style.display = (level === 'all' || card.dataset.severity === level) ? '' : 'none';
+  });
+}
+
+// Highlight active filter button styling
+document.querySelectorAll('.active-filter').forEach(btn => {
+  btn.style.borderColor = 'var(--cyan)';
+  btn.style.color = 'var(--cyan)';
+});
+</script>
+{% endblock %}

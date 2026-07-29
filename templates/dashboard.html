@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% set report_id = report.id %}
+{% block title %}Dashboard — {{ report.patient_name }} | MediLensAI{% endblock %}
+
+{% block content %}
+<!-- ── Patient header ─────────────────────────────────────────────────────── -->
+<div class="patient-header fade-in">
+  <div class="patient-avatar">👤</div>
+  <div style="flex:1;">
+    <div class="patient-name">{{ report.patient_name }}</div>
+    <div class="patient-meta">Age {{ report.patient_age }} &nbsp;·&nbsp; {{ report.patient_gender }}</div>
+    <div class="patient-date">Analysed on {{ report.upload_date }}</div>
+  </div>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <button class="btn btn-voice" id="voice-btn">🔊 Read Aloud</button>
+    <a href="{{ url_for('export_fhir', report_id=report.id) }}" class="btn btn-secondary" style="border-color: var(--purple); color: #c084fc;" title="Export HL7 FHIR R4 EMR Standard JSON Bundle">
+      🛡️ Export FHIR
+    </a>
+    <a href="{{ url_for('index') }}" class="btn btn-secondary">+ New Report</a>
+  </div>
+</div>
+
+<!-- ── Overall risk card ──────────────────────────────────────────────────── -->
+<div class="card fade-in" style="margin-bottom:28px;">
+  <div class="risk-overview">
+    <!-- Ring placeholder (drawn by charts.js mini gauge) -->
+    <div class="risk-ring-wrap">
+      <canvas id="overall-gauge" width="140" height="140"></canvas>
+      <div class="risk-ring-center">
+        {% set lvl = report.overall_risk_level | lower | replace(' ', '-') %}
+        <div class="risk-level-text" style="color:
+          {% if report.overall_risk_level == 'Critical' %}#ff6b6b
+          {% elif report.overall_risk_level == 'High' %}var(--red)
+          {% elif report.overall_risk_level == 'Moderate' %}var(--amber)
+          {% elif report.overall_risk_level == 'Normal' %}var(--green)
+          {% else %}var(--text-muted){% endif %}">
+          {{ report.overall_risk_level }}
+        </div>
+        <div class="risk-score-text">{{ "%.1f"|format(report.overall_risk_score) }} / 4</div>
+      </div>
+    </div>
+
+    <div class="risk-details">
+      <h3>Overall Health Risk</h3>
+      <p style="margin-bottom:14px;">
+        {% if report.overall_risk_level == 'Normal' %}
+          All detected parameters are within the healthy range. Keep up your lifestyle!
+        {% elif report.overall_risk_level == 'Moderate' %}
+          Some values need attention. Follow the recommendations below and monitor closely.
+        {% elif report.overall_risk_level in ['High', 'Critical'] %}
+          Critical or high-risk values detected. Please consult a healthcare professional promptly.
+        {% else %}
+          Risk analysis complete. Review each parameter below.
+        {% endif %}
+      </p>
+      <span class="badge badge-{{ lvl }}">{{ report.overall_risk_level }} Risk</span>
+    </div>
+
+    <!-- Report image preview -->
+    {% if report.filename %}
+    <div class="report-img-wrap" style="max-width:180px; flex-shrink:0;">
+      <img src="{{ url_for('static', filename='uploads/' ~ report.filename) }}"
+           alt="Report preview" onerror="this.parentElement.style.display='none'"/>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ── Metric cards ───────────────────────────────────────────────────────── -->
+{% if parameters %}
+<h2 class="section-title">🧪 Detected Health Parameters</h2>
+<div class="metrics-grid stagger">
+  {% for p in parameters %}
+  <div class="metric-card risk-{{ p.risk_level | lower | replace(' ', '-') }}">
+    <div class="metric-header">
+      <div>
+        <div class="metric-icon">{{ p.icon if p.icon else '🔬' }}</div>
+        <div class="metric-name">{{ p.display_name }}</div>
+      </div>
+      {% set lvl = p.risk_level | lower | replace(' ', '-') %}
+      <span class="badge badge-{{ lvl }}">{{ p.risk_level }}</span>
+    </div>
+
+    <div class="metric-value">{{ "%.1f"|format(p.value) }}</div>
+    <div class="metric-unit">{{ p.unit }}</div>
+    <div class="metric-range">Normal: {{ p.normal_min }} – {{ p.normal_max }} {{ p.unit }}</div>
+
+    <!-- Mini gauge -->
+    <canvas id="gauge-{{ p.id }}" width="120" height="64" style="margin-top:8px;"></canvas>
+
+    <!-- Progress bar -->
+    {% set range = p.normal_max - p.normal_min %}
+    {% if range > 0 %}
+      {% set pct = [(((p.value - p.normal_min) / range) * 100), 0] | max %}
+      {% set pct = [pct, 100] | min %}
+    {% else %}
+      {% set pct = 50 %}
+    {% endif %}
+    <div class="progress-bar-wrap" style="margin-top:6px;">
+      <div class="progress-bar risk-{{ p.risk_level | lower | replace(' ', '-') }}" style="width:{{ pct }}%;"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="empty-icon">🔬</div>
+    <p>No medical parameters were detected in this report.<br>
+       Try uploading a clearer image or ensure the report contains standard medical values.</p>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Charts row ─────────────────────────────────────────────────────────── -->
+{% if parameters %}
+<div class="grid-2" style="margin-bottom:28px;">
+  <div class="card">
+    <h3 class="section-title" style="font-size:15px;">📊 Parameter Overview</h3>
+    <div class="chart-container">
+      <canvas id="parameters-chart"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <h3 class="section-title" style="font-size:15px;">🎯 Risk Distribution</h3>
+    <div class="chart-container">
+      <canvas id="risk-distribution-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+{% if parameters | length >= 3 %}
+<div class="card" style="margin-bottom:28px;">
+  <h3 class="section-title" style="font-size:15px;">🕸️ Risk Profile Radar</h3>
+  <div class="chart-container" style="height:340px;">
+    <canvas id="radar-chart"></canvas>
+  </div>
+</div>
+{% endif %}
+
+<!-- ── Trend charts ──────────────────────────────────────────────────────── -->
+<div class="card" style="margin-bottom:28px; display:none;" id="trends-section">
+  <h3 class="section-title" style="font-size:15px;">📈 Health Trends</h3>
+  <div id="trends-grid" class="trends-grid"></div>
+</div>
+{% endif %}
+
+<!-- ── Alerts ─────────────────────────────────────────────────────────────── -->
+{% if alerts %}
+<h2 class="section-title">🚨 Health Alerts for This Report</h2>
+<div style="margin-bottom:28px;">
+  {% for alert in alerts %}
+  <div class="alert-card severity-{{ alert.severity | lower }}" id="alert-{{ alert.id }}">
+    <div class="alert-icon">
+      {% if alert.severity == 'Critical' %}🚨
+      {% elif alert.severity == 'High' %}⚠️
+      {% elif alert.severity == 'Moderate' %}🔶
+      {% else %}🔵{% endif %}
+    </div>
+    <div style="flex:1;">
+      <div class="alert-message">{{ alert.message }}</div>
+      <div class="alert-meta">
+        {{ alert.timestamp }}
+        {% if alert.sms_simulated %}
+        <span class="sms-badge">📱 SMS Logged</span>
+        {% endif %}
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm"
+            onclick="dismissAlert({{ alert.id }}, this)">Dismiss</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── Recommendations ────────────────────────────────────────────────────── -->
+{% if recommendations %}
+<h2 class="section-title">💡 Personalised Recommendations</h2>
+<div class="recs-grid stagger" style="margin-bottom:40px;">
+  {% for rec in recommendations %}
+  <div class="rec-card">
+    <div class="rec-category cat-{{ rec.category | lower }}">{{ rec.category }}</div>
+    <div class="rec-param">{{ rec.display_name }} · {{ rec.risk_level }}</div>
+    <div class="rec-text">{{ rec.recommendation_text }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- ── Actions ────────────────────────────────────────────────────────────── -->
+<div style="display:flex; gap:12px; justify-content:flex-end; margin-bottom:40px;">
+  <a href="{{ url_for('reports') }}" class="btn btn-secondary">← All Reports</a>
+  <form method="POST" action="{{ url_for('delete_report', report_id=report.id) }}"
+        onsubmit="return confirm('Delete this report and all its data?')">
+    <button type="submit" class="btn btn-danger">🗑 Delete Report</button>
+  </form>
+</div>
+
+<!-- ── Simulated Phone SMS Notifications (Overlay) ───────────────────────── -->
+{% if new_sms_alerts %}
+<div class="sms-notifications-container">
+  {% for alert in new_sms_alerts %}
+  <div class="sms-notification-bubble">
+    <div class="sms-notification-header">
+      <span class="sms-notification-icon">💬</span>
+      <span class="sms-notification-app">MESSAGES</span>
+      <span class="sms-notification-time">now</span>
+    </div>
+    <div class="sms-notification-title">MediLensAI Alert</div>
+    <div class="sms-notification-body">{{ alert.message }}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<!-- Local Chart.js — no internet required -->
+<script src="{{ url_for('static', filename='js/lib/chart.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+
+<script>
+// Pass report_id to body for JS modules
+document.body.dataset.reportId = "{{ report.id }}";
+
+// Draw overall risk gauge
+document.addEventListener('DOMContentLoaded', () => {
+  const score = {{ report.overall_risk_score }};
+  const level = "{{ report.overall_risk_level }}";
+  const ctx   = document.getElementById('overall-gauge');
+  if (!ctx) return;
+
+  const COLORS = {
+    Normal:   { bg:'rgba(16,185,129,0.7)',  border:'#10b981' },
+    Low:      { bg:'rgba(0,212,255,0.7)',    border:'#00d4ff' },
+    Moderate: { bg:'rgba(245,158,11,0.7)',   border:'#f59e0b' },
+    High:     { bg:'rgba(239,68,68,0.7)',    border:'#ef4444' },
+    Critical: { bg:'rgba(220,38,38,0.85)',   border:'#dc2626' },
+    Unknown:  { bg:'rgba(75,85,99,0.4)',     border:'#4b5563' },
+  };
+  const c = COLORS[level] || COLORS.Unknown;
+  const pct = Math.min((score / 4) * 100, 100);
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [pct, 100 - pct],
+        backgroundColor: [c.bg, 'rgba(255,255,255,0.05)'],
+        borderColor:     [c.border, 'transparent'],
+        borderWidth: [3, 0],
+      }],
+    },
+    options: {
+      responsive: false,
+      cutout: '78%',
+      circumference: 220,
+      rotation: -110,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    },
+  });
+});
+</script>
+{% endblock %}

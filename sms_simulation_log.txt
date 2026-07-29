@@ -1,0 +1,204 @@
+
+--- SMS Batch - 2026-07-12 13:41:10 ---
+TO: Patient Contact
+MSG: ⚠️  Systolic BP is LOW (120.0 mmHg) — monitor for dizziness or fainting.
+
+
+--- SMS Batch - 2026-07-12 17:15:21 ---
+TO: Patient Contact
+MSG: 🚨 Hemoglobin is LOW (8.1 g/dL) — anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: 🚨 Cholesterol is HIGH (285.0 mg/dL) — cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: 🚨 Systolic BP is HIGH (170.0 mmHg) — hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: 🚨 Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: 🚨 Creatinine is HIGH (2.3 mg/dL) — possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: ⚠️  Uric acid is HIGH (9.8 mg/dL) — risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-12 17:31:24 ---
+TO: Patient Contact
+MSG: 🚨 Hemoglobin is LOW (8.1 g/dL) — anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: 🚨 Cholesterol is HIGH (285.0 mg/dL) — cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: 🚨 Systolic BP is HIGH (170.0 mmHg) — hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: 🚨 Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: 🚨 Creatinine is HIGH (2.3 mg/dL) — possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: ⚠️  Uric acid is HIGH (9.8 mg/dL) — risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-12 18:42:37 ---
+TO: Patient Contact
+MSG: 🚨 Hemoglobin is LOW (8.1 g/dL) — anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: 🚨 Cholesterol is HIGH (285.0 mg/dL) — cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: 🚨 Systolic BP is HIGH (170.0 mmHg) — hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: 🚨 Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: 🚨 Creatinine is HIGH (2.3 mg/dL) — possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: ⚠️  Uric acid is HIGH (9.8 mg/dL) — risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-19 17:06:26 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-19 21:53:14 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-27 16:20:30 ---
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+[2026-07-28 19:53:45] [OFFLINE SMS OTP] Recipient: +91 9047356076 | OTP Code: 286843 | Expire: 5 min
+
+--- SMS Batch - 2026-07-28 21:05:48 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-28 21:06:50 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-28 21:08:09 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+
+
+--- SMS Batch - 2026-07-28 21:10:22 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+TO: Patient Contact
+MSG: [ALERT] Systolic BP is HIGH (170.0 mmHg) - hypertension. Medical consultation required.
+
+TO: Patient Contact
+MSG: [ALERT] Diastolic BP is HIGH (110.0 mmHg). Medical evaluation required.
+
+TO: Patient Contact
+MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
+
+TO: Patient Contact
+MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
+

@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="max-width: 480px; margin: 50px auto 40px; padding: 0 16px;">
+  <div class="card" style="padding: 36px 32px; border-radius: var(--radius-xl); backdrop-filter: blur(16px); background: rgba(13, 22, 38, 0.88); border: 1px solid rgba(0, 212, 255, 0.25); box-shadow: var(--shadow-lg);">
+    
+    <!-- Header -->
+    <div style="text-align: center; margin-bottom: 24px;">
+      <div style="display: inline-flex; align-items: center; justify-content: center; width: 60px; height: 60px; border-radius: 50%; background: rgba(0, 212, 255, 0.12); border: 1px solid var(--border-accent); margin-bottom: 14px; font-size: 26px;">
+        🔐
+      </div>
+      <h2 style="font-size: 24px; font-weight: 700; background: linear-gradient(135deg, #e8f0ff, var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        LOGIN NOW
+      </h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+        Select your role to access your dedicated portal
+      </p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category if category != 'error' else 'danger' }}" style="margin-bottom: 20px; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 13px; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5;">
+            ⚠️ {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('login') }}" method="POST">
+      
+      <!-- User Type / Role Selector -->
+      <div style="margin-bottom: 18px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--cyan); margin-bottom: 8px;">
+          Select Portal Role
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 6px;">
+          <label id="lbl-user" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 8px; border-radius: var(--radius-md); background: rgba(0, 212, 255, 0.15); border: 1px solid var(--cyan); cursor: pointer; color: #fff; font-weight: 600; font-size: 13px; transition: var(--transition); text-align: center;">
+            <input type="radio" name="user_type" value="patient" checked onchange="toggleRoleStyle('patient')" style="accent-color: var(--cyan);">
+            👤 Patient Portal
+          </label>
+          <label id="lbl-admin" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 8px; border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); cursor: pointer; color: var(--text-secondary); font-weight: 600; font-size: 13px; transition: var(--transition); text-align: center;">
+            <input type="radio" name="user_type" value="doctor" onchange="toggleRoleStyle('doctor')" style="accent-color: var(--purple);">
+            🩺 Doctor / Org
+          </label>
+        </div>
+      </div>
+
+      <!-- Username or Mobile input -->
+      <div style="margin-bottom: 16px;">
+        <label style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 6px;">
+          Enter Username or Mobile Number
+        </label>
+        <input type="text" id="username-input" name="username" required placeholder="Enter username or mobile number" autocomplete="username"
+               style="width: 100%; padding: 12px 16px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); font-size: 14px; outline: none;">
+      </div>
+
+      <!-- Password input with Eye toggle -->
+      <div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label style="font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary);">
+            Enter Password
+          </label>
+          <a href="javascript:void(0)" onclick="openResetModal()" style="font-size: 12px; color: var(--cyan); text-decoration: none; font-weight: 600;">
+            Forgot Password?
+          </a>
+        </div>
+        <div style="position: relative;">
+          <input type="password" id="password-input" name="password" required placeholder="Enter password" autocomplete="current-password"
+                 style="width: 100%; padding: 12px 42px 12px 16px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-primary); font-size: 14px; outline: none;">
+          <button type="button" id="toggle-password-btn" onclick="togglePasswordVisibility('password-input', 'toggle-password-btn')"
+                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-secondary); padding: 4px;" title="Show/Hide Password">
+            👁️
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember device checkbox -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 18px; margin-top: 10px;">
+        <input type="checkbox" id="remember" name="remember" checked style="accent-color: var(--cyan); width: 16px; height: 16px; cursor: pointer;">
+        <label for="remember" style="font-size: 12px; color: var(--text-secondary); cursor: pointer; user-select: none;">
+          Remember this device (Stay signed in for 30 days)
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border-radius: var(--radius-md); justify-content: center; margin-bottom: 20px;">
+        Sign In ➔
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-muted);">
+      Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--cyan); text-decoration: none; font-weight: 600;">Register Now</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Offline Password Reset Modal (SMS OTP & QR Authenticator) ───────────── -->
+<div id="reset-modal" style="display: none; position: fixed; inset: 0; background: rgba(5, 10, 20, 0.85); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 16px;">
+  <div class="card fade-in" style="max-width: 460px; width: 100%; padding: 28px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border-accent); position: relative; background: #0c1726;">
+    <button onclick="closeResetModal()" style="position: absolute; right: 16px; top: 16px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+    
+    <div style="text-align: center; margin-bottom: 16px;">
+      <h3 style="font-size: 20px; font-weight: 700; color: #fff;">Offline Password Reset</h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Choose your preferred offline verification method</p>
+    </div>
+
+    <!-- Method Switcher Tabs -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+      <button type="button" id="tab-btn-sms" onclick="switchResetTab('sms')" style="padding: 8px 6px; border-radius: var(--radius-sm); border: none; background: rgba(0, 212, 255, 0.15); color: #fff; font-weight: 600; font-size: 12px; cursor: pointer;">
+        📱 Device SMS OTP
+      </button>
+      <button type="button" id="tab-btn-qr" onclick="switchResetTab('qr')" style="padding: 8px 6px; border-radius: var(--radius-sm); border: none; background: transparent; color: var(--text-secondary); font-weight: 600; font-size: 12px; cursor: pointer;">
+        📸 Offline QR Authenticator
+      </button>
+    </div>
+
+    <!-- Feedback alert banner -->
+    <div id="modal-alert" style="display: none; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 16px;"></div>
+
+    <!-- TAB 1: SMS OTP reset -->
+    <div id="tab-sms-content">
+      <div id="step-1-container">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--cyan); margin-bottom: 6px;">Enter Registered Mobile Number</label>
+          <input type="tel" id="reset-mobile-input" placeholder="e.g. 9876543210" maxlength="10"
+                 style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border-accent); color: #fff; outline: none; font-size: 14px;">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="sendMobileOTP()" style="width: 100%; justify-content: center; padding: 12px;">
+          📱 Send Offline SMS OTP
+        </button>
+      </div>
+
+      <div id="step-2-container" style="display: none;">
+        <div id="sms-banner" style="background: rgba(0, 212, 255, 0.12); border: 1px solid var(--cyan); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px; font-size: 12px; color: #fff;">
+          💬 <strong>Device SMS Dispatched:</strong> <span id="sms-text-preview">OTP sent to your phone</span>
+          <div id="sms-action-btn" style="margin-top: 8px;"></div>
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Enter 6-Digit OTP</label>
+          <input type="text" id="reset-otp-input" placeholder="e.g. 482910" maxlength="6"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 16px; letter-spacing: 4px; text-align: center; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 14px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">New Password</label>
+          <input type="password" id="reset-new-pass" placeholder="Enter new password"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 14px; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Confirm New Password</label>
+          <input type="password" id="reset-conf-pass" placeholder="Confirm new password"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 14px; outline: none;">
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="verifyMobileOTP()" style="width: 100%; justify-content: center; padding: 12px;">
+          🔒 Verify OTP &amp; Reset Password
+        </button>
+      </div>
+    </div>
+
+    <!-- TAB 2: Offline QR Authenticator reset -->
+    <div id="tab-qr-content" style="display: none;">
+      <div id="qr-step-1">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: #c084fc; margin-bottom: 6px;">Enter Username or Mobile Number</label>
+          <input type="text" id="qr-identifier-input" placeholder="e.g. priya or 9876543210"
+                 style="width: 100%; padding: 12px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--purple); color: #fff; outline: none; font-size: 14px;">
+        </div>
+        <button type="button" class="btn btn-primary" onclick="generateQROTP()" style="width: 100%; justify-content: center; padding: 12px; background: linear-gradient(135deg, var(--purple), #6366f1);">
+          📸 Generate Offline QR Code
+        </button>
+      </div>
+
+      <div id="qr-step-2" style="display: none;">
+        <div style="text-align: center; margin-bottom: 16px;">
+          <div id="qr-code-svg-wrap" style="display: inline-block; margin-bottom: 8px;"></div>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Scan with <strong>Google Authenticator</strong> / <strong>Microsoft Authenticator</strong>
+          </div>
+          <div style="font-size: 11px; color: var(--cyan); margin-top: 4px; font-family: monospace;">
+            Secret Key: <strong id="qr-secret-key">JBSWY3DPEHPK3PXP</strong>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Enter 6-Digit Authenticator Code</label>
+          <input type="text" id="qr-totp-input" placeholder="e.g. 849201" maxlength="6"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--purple); color: #fff; font-size: 16px; letter-spacing: 4px; text-align: center; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">New Password</label>
+          <input type="password" id="qr-new-pass" placeholder="Enter new password"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 14px; outline: none;">
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Confirm New Password</label>
+          <input type="password" id="qr-conf-pass" placeholder="Confirm new password"
+                 style="width: 100%; padding: 10px; border-radius: var(--radius-md); background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 14px; outline: none;">
+        </div>
+
+        <button type="button" class="btn btn-primary" onclick="verifyQROTP()" style="width: 100%; justify-content: center; padding: 12px; background: linear-gradient(135deg, var(--purple), #6366f1);">
+          🔒 Verify Code &amp; Reset Password
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</div>
+
+<script>
+function toggleRoleStyle(role) {
+  const lblUser  = document.getElementById('lbl-user');
+  const lblAdmin = document.getElementById('lbl-admin');
+  const userInput = document.getElementById('username-input');
+  const passInput = document.getElementById('password-input');
+
+  // Clear existing inputs when switching roles
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
+
+  if (role === 'patient') {
+    lblUser.style.background = 'rgba(0, 212, 255, 0.15)';
+    lblUser.style.borderColor = 'var(--cyan)';
+    lblUser.style.color = '#fff';
+    lblAdmin.style.background = 'rgba(255, 255, 255, 0.05)';
+    lblAdmin.style.borderColor = 'var(--border)';
+    lblAdmin.style.color = 'var(--text-secondary)';
+  } else {
+    lblAdmin.style.background = 'rgba(124, 58, 237, 0.25)';
+    lblAdmin.style.borderColor = 'var(--purple)';
+    lblAdmin.style.color = '#fff';
+    lblUser.style.background = 'rgba(255, 255, 255, 0.05)';
+    lblUser.style.borderColor = 'var(--border)';
+    lblUser.style.color = 'var(--text-secondary)';
+  }
+}
+
+function togglePasswordVisibility(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  if (!input || !btn) return;
+
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+    btn.title = 'Hide Password';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+    btn.title = 'Show Password';
+  }
+}
+
+// ─── Offline SMS Reset Modal Controls ─────────────────────────────────────
+function openResetModal() {
+  const modal = document.getElementById('reset-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeResetModal() {
+  const modal = document.getElementById('reset-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function showModalAlert(msg, type = 'danger') {
+  const alertEl = document.getElementById('modal-alert');
+  if (!alertEl) return;
+  alertEl.style.display = 'block';
+  alertEl.style.background = type === 'success' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+  alertEl.style.border = type === 'success' ? '1px solid var(--green)' : '1px solid rgba(239, 68, 68, 0.4)';
+  alertEl.style.color = type === 'success' ? '#6ee7b7' : '#fca5a5';
+  alertEl.innerHTML = (type === 'success' ? '✓ ' : '⚠️ ') + msg;
+}
+
+let resetTargetMobile = '';
+
+function sendMobileOTP() {
+  const mobileInput = document.getElementById('reset-mobile-input').value.trim();
+  if (!mobileInput) {
+    showModalAlert('Please enter your registered 10-digit mobile number.', 'danger');
+    return;
+  }
+
+  fetch('/request-sms-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mobile_number: mobileInput })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      resetTargetMobile = data.mobile;
+      document.getElementById('step-1-container').style.display = 'none';
+      document.getElementById('step-2-container').style.display = 'block';
+      
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const textPreview = `Security OTP Code: [ ${data.otp} ] sent to +91 ${data.mobile}`;
+      document.getElementById('sms-text-preview').textContent = textPreview;
+      
+      const actionContainer = document.getElementById('sms-action-btn');
+      if (isMobile) {
+        actionContainer.innerHTML = `<a href="${data.sms_uri}" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; padding:6px; font-size:11px;">📱 Send Text via Native Device SIM</a>`;
+      } else {
+        actionContainer.innerHTML = `<small style="color:var(--cyan); font-weight:600;">(OTP Auto-Filled for Testing: ${data.otp})</small>`;
+      }
+      
+      // Pre-fill OTP field for convenient testing
+      document.getElementById('reset-otp-input').value = data.otp;
+      showModalAlert(data.message, 'success');
+    } else {
+      showModalAlert(data.message, 'danger');
+    }
+  })
+  .catch(err => {
+    showModalAlert('Error connecting to local server.', 'danger');
+  });
+}
+
+function verifyMobileOTP() {
+  const otpCode  = document.getElementById('reset-otp-input').value.trim();
+  const newPass  = document.getElementById('reset-new-pass').value.trim();
+  const confPass = document.getElementById('reset-conf-pass').value.trim();
+
+  if (!otpCode || !newPass || !confPass) {
+    showModalAlert('Please fill in all fields.', 'danger');
+    return;
+  }
+
+  if (newPass !== confPass) {
+    showModalAlert('Passwords do not match.', 'danger');
+    return;
+  }
+
+  fetch('/verify-sms-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mobile_number: resetTargetMobile,
+      otp_code: otpCode,
+      new_password: newPass,
+      confirm_password: confPass
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showModalAlert(data.message, 'success');
+      setTimeout(() => {
+        closeResetModal();
+        window.location.reload();
+      }, 1800);
+    } else {
+      showModalAlert(data.message, 'danger');
+    }
+  })
+  .catch(err => {
+    showModalAlert('Error verifying OTP.', 'danger');
+  });
+}
+
+// ─── Reset Modal Tab Switching ─────────────────────────────────────────────
+function switchResetTab(tab) {
+  const btnSms = document.getElementById('tab-btn-sms');
+  const btnQr  = document.getElementById('tab-btn-qr');
+  const contentSms = document.getElementById('tab-sms-content');
+  const contentQr  = document.getElementById('tab-qr-content');
+
+  const alertEl = document.getElementById('modal-alert');
+  if (alertEl) alertEl.style.display = 'none';
+
+  if (tab === 'sms') {
+    btnSms.style.background = 'rgba(0, 212, 255, 0.15)';
+    btnSms.style.color = '#fff';
+    btnQr.style.background = 'transparent';
+    btnQr.style.color = 'var(--text-secondary)';
+    contentSms.style.display = 'block';
+    contentQr.style.display = 'none';
+  } else {
+    btnQr.style.background = 'rgba(124, 58, 237, 0.25)';
+    btnQr.style.color = '#fff';
+    btnSms.style.background = 'transparent';
+    btnSms.style.color = 'var(--text-secondary)';
+    contentQr.style.display = 'block';
+    contentSms.style.display = 'none';
+  }
+}
+
+let qrTargetIdentifier = '';
+
+function generateQROTP() {
+  const inputEl = document.getElementById('qr-identifier-input');
+  const identifier = inputEl ? inputEl.value.trim() : '';
+
+  if (!identifier) {
+    showModalAlert('Please enter your registered Username or Mobile Number.', 'danger');
+    return;
+  }
+
+  fetch('/request-qr-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ identifier: identifier })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      qrTargetIdentifier = identifier;
+      document.getElementById('qr-step-1').style.display = 'none';
+      document.getElementById('qr-step-2').style.display = 'block';
+
+      document.getElementById('qr-code-svg-wrap').innerHTML = data.qr_svg;
+      document.getElementById('qr-secret-key').textContent = data.secret;
+
+      // Clear TOTP input field for manual user entry from Authenticator app
+      document.getElementById('qr-totp-input').value = '';
+
+      showModalAlert(data.message, 'success');
+    } else {
+      showModalAlert(data.message, 'danger');
+    }
+  })
+  .catch(err => {
+    showModalAlert('Error generating QR Code.', 'danger');
+  });
+}
+
+function verifyQROTP() {
+  const totpCode = document.getElementById('qr-totp-input').value.trim();
+  const newPass  = document.getElementById('qr-new-pass').value.trim();
+  const confPass = document.getElementById('qr-conf-pass').value.trim();
+
+  if (!totpCode || !newPass || !confPass) {
+    showModalAlert('Please fill in all fields.', 'danger');
+    return;
+  }
+
+  if (newPass !== confPass) {
+    showModalAlert('Passwords do not match.', 'danger');
+    return;
+  }
+
+  fetch('/verify-qr-otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      identifier: qrTargetIdentifier,
+      totp_code: totpCode,
+      new_password: newPass,
+      confirm_password: confPass
+    })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      showModalAlert(data.message, 'success');
+      setTimeout(() => {
+        closeResetModal();
+        window.location.reload();
+      }, 1800);
+    } else {
+      showModalAlert(data.message, 'danger');
+    }
+  })
+  .catch(err => {
+    showModalAlert('Error verifying TOTP code.', 'danger');
+  });
+}
+</script>
+{% endblock %}

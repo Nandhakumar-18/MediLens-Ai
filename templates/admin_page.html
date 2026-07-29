@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Admin Control Center | MediLensAI{% endblock %}
+
+{% block content %}
+<!-- Topbar -->
+<div class="topbar fade-in">
+  <div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-size: 11px; font-weight: 700; background: linear-gradient(135deg, var(--purple), var(--cyan)); color: #fff; padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">ADMINISTRATOR PORTAL</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Logged in as <strong>{{ session.get('username') }}</strong></span>
+    </div>
+    <h1 class="page-title">🛡️ Admin Control Center</h1>
+    <p class="page-subtitle">Upload medical reports, perform OCR analysis, monitor emergency SMS alerts, and manage system records</p>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div class="grid-4 fade-in" style="margin-bottom: 32px;">
+  <div class="stat-card">
+    <div class="stat-icon cyan">📊</div>
+    <div>
+      <div class="stat-value">{{ stats.total_reports }}</div>
+      <div class="stat-label">Reports Analysed</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber">🔔</div>
+    <div>
+      <div class="stat-value">{{ stats.unread_alerts }}</div>
+      <div class="stat-label">Unread Alerts</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red">⚠️</div>
+    <div>
+      <div class="stat-value">{{ stats.high_risk_count }}</div>
+      <div class="stat-label">High-Risk Reports</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">🛡️</div>
+    <div>
+      <div class="stat-value">100%</div>
+      <div class="stat-label">Offline Security</div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin Upload Section -->
+<div class="card fade-in" style="max-width:850px; margin: 0 auto 40px;">
+  <h2 class="section-title">📤 Upload & Analyse Medical Report</h2>
+
+  <form id="upload-form" method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+    <div class="upload-zone" id="upload-zone">
+      <span class="upload-icon">🗂️</span>
+      <p class="upload-title">Drag &amp; Drop medical report image or PDF</p>
+      <p class="upload-sub">Supports PNG, JPG, PDF, TIFF — 100% Offline OCR Processing</p>
+      <div class="upload-types">
+        <span class="file-type-chip">PNG</span>
+        <span class="file-type-chip">JPG</span>
+        <span class="file-type-chip">PDF</span>
+        <span class="file-type-chip">TIFF</span>
+      </div>
+      <input type="file" id="file-input" name="file" accept=".png,.jpg,.jpeg,.pdf,.tiff,.bmp,.webp" hidden/>
+    </div>
+
+    <div class="file-preview" id="file-preview" style="display:none; margin-top:16px;">
+      <div class="file-info">
+        <span class="file-name" id="file-name">filename.pdf</span>
+        <span class="file-size" id="file-size">0 KB</span>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" id="btn-change-file">Change File</button>
+    </div>
+
+    <!-- Patient metadata -->
+    <div class="grid-3" style="margin-top:20px; margin-bottom:20px;">
+      <div class="form-group">
+        <label class="form-label" for="patient_name">Patient Name</label>
+        <input class="form-input" type="text" id="patient_name" name="patient_name" placeholder="e.g. Nandhakumar"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="patient_age">Age</label>
+        <input class="form-input" type="number" id="patient_age" name="patient_age" placeholder="e.g. 28" min="0" max="120"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="patient_gender">Gender</label>
+        <select class="form-select" id="patient_gender" name="patient_gender">
+          <option value="Unknown">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:14px; font-size:15px;">
+      🔍 Run OCR &amp; Clinical Risk Pipeline ➔
+    </button>
+  </form>
+</div>
+
+<!-- Admin Recent Management Table -->
+<div class="card fade-in">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+    <h2 class="section-title" style="margin-bottom:0;">📋 System Reports Management</h2>
+    <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-sm">View All Reports →</a>
+  </div>
+
+  {% if recent_reports %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Patient Name</th>
+            <th>Age / Gender</th>
+            <th>Upload Date</th>
+            <th>Risk Level</th>
+            <th>Risk Score</th>
+            <th>Admin Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_reports %}
+          <tr>
+            <td style="color:var(--text-muted); font-size:12px;">{{ r.id }}</td>
+            <td><strong>{{ r.patient_name }}</strong></td>
+            <td style="color:var(--text-secondary);">{{ r.patient_age }} / {{ r.patient_gender }}</td>
+            <td style="color:var(--text-muted); font-size:12px;">{{ r.upload_date }}</td>
+            <td>
+              {% set lvl = r.overall_risk_level | lower | replace(' ', '-') %}
+              <span class="badge badge-{{ lvl }}">{{ r.overall_risk_level }}</span>
+            </td>
+            <td><strong>{{ "%.1f"|format(r.overall_risk_score) }}/4</strong></td>
+            <td>
+              <div style="display:flex; gap:8px;">
+                <a href="{{ url_for('dashboard', report_id=r.id) }}" class="btn btn-secondary btn-sm">Inspect</a>
+                <form method="POST" action="{{ url_for('delete_report', report_id=r.id) }}" style="display:inline;" onsubmit="return confirm('Delete this report?')">
+                  <button type="submit" class="btn btn-danger btn-sm">🗑 Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p style="color:var(--text-muted); text-align:center; padding:20px;">No reports analyzed yet. Upload a file above to begin.</p>
+  {% endif %}
+</div>
+{% endblock %}

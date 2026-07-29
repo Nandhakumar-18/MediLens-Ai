@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="MediLensAI — Offline Personal Health Intelligence and Early Warning System"/>
+  <title>{% block title %}MediLensAI{% endblock %}</title>
+
+  <!-- Local stylesheet — no CDN -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+
+  {% block head %}{% endblock %}
+</head>
+<body data-report-id="{{ report_id | default('') }}">
+
+<!-- ── Loading overlay ──────────────────────────────────────────────────── -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <p class="loading-text" id="loading-text">Processing your report…</p>
+</div>
+
+<!-- ── Flash messages ───────────────────────────────────────────────────── -->
+<div class="flash-messages">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash flash-{{ category }}">
+        <span>{{ '✓' if category == 'success' else '✕' }}</span>
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endwith %}
+</div>
+
+<!-- ── Layout ────────────────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🩺</div>
+      <div>
+        <div class="logo-text">MediLensAI</div>
+        <div class="logo-sub">Health Intelligence</div>
+      </div>
+    </div>
+
+    <p class="nav-section-label">Navigation</p>
+    <nav>
+      <a href="{{ url_for('index') }}" class="nav-item">
+        <span class="nav-icon">🏠</span> Home
+      </a>
+      <a href="{{ url_for('reports') }}" class="nav-item">
+        <span class="nav-icon">📋</span> Reports
+      </a>
+      <a href="{{ url_for('alerts_page') }}" class="nav-item">
+        <span class="nav-icon">🔔</span> Alerts
+        <span class="alert-badge" id="nav-alert-badge" style="display:none">0</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      {% if session.get('user_id') %}
+        <div style="padding: 12px; border-radius: var(--radius-md); background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(0, 212, 255, 0.15); border: 1px solid var(--border-accent); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+              {% if session.get('role') in ('doctor', 'admin') %}🩺{% else %}👤{% endif %}
+            </div>
+            <div style="overflow: hidden; flex: 1;">
+              <div style="font-weight: 700; font-size: 13px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                {{ session.get('username', 'User') }}
+              </div>
+              <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; color: {% if session.get('role') in ('doctor', 'admin') %}#c084fc{% else %}var(--cyan){% endif %};">
+                {% if session.get('role') in ('doctor', 'admin') %}Doctor / Org{% else %}Patient Account{% endif %}
+              </div>
+            </div>
+          </div>
+          <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; font-size: 12px; padding: 6px 10px; border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; background: rgba(239, 68, 68, 0.1);">
+            🚪 Sign Out / Logout
+          </a>
+        </div>
+      {% endif %}
+      <div class="offline-badge">Fully Offline</div>
+      <p>All data stored locally.<br>No internet required.</p>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+</div>
+
+<!-- ── Local JS — no CDN ─────────────────────────────────────────────────── -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+</body>
+</html>

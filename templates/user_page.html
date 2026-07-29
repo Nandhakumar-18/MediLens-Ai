@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}User Portal | MediLensAI Health Intelligence{% endblock %}
+
+{% block content %}
+<!-- Topbar -->
+<div class="topbar fade-in">
+  <div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+      <span style="font-size: 11px; font-weight: 700; background: rgba(0, 212, 255, 0.2); color: var(--cyan); border: 1px solid var(--border-accent); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.05em;">USER PORTAL</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Welcome, <strong>{{ session.get('username') }}</strong></span>
+    </div>
+    <h1 class="page-title">👤 Patient Health Dashboard &amp; Reports</h1>
+    <p class="page-subtitle">View your analyzed medical reports, clinical recommendations, voice summaries, and health trend graphs</p>
+  </div>
+</div>
+
+<!-- Welcome Card for User -->
+<div class="card fade-in" style="margin-bottom: 32px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(124, 58, 237, 0.08)); border: 1px solid var(--border-accent);">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h2 style="font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+        👋 Welcome to your Health Intelligence Portal
+      </h2>
+      <p style="font-size: 13px; color: var(--text-secondary); max-width: 600px;">
+        All your medical test results are automatically parsed into plain-language summaries. Select any report below to view interactive radar risk charts, semi-circular gauges, lifestyle advice, and voice readouts.
+      </p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <a href="{{ url_for('reports') }}" class="btn btn-primary">
+        📋 View All Reports
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- User Reports Table -->
+<div class="card fade-in">
+  <h2 class="section-title">📋 Your Medical Reports</h2>
+
+  {% if recent_reports %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Report #</th>
+            <th>Patient Name</th>
+            <th>Age / Gender</th>
+            <th>Date</th>
+            <th>Health Risk Level</th>
+            <th>Overall Risk Score</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent_reports %}
+          <tr>
+            <td style="color:var(--text-muted); font-size:12px;">#{{ r.id }}</td>
+            <td><strong>{{ r.patient_name }}</strong></td>
+            <td style="color:var(--text-secondary);">{{ r.patient_age }} / {{ r.patient_gender }}</td>
+            <td style="color:var(--text-muted); font-size:12px;">{{ r.upload_date }}</td>
+            <td>
+              {% set lvl = r.overall_risk_level | lower | replace(' ', '-') %}
+              <span class="badge badge-{{ lvl }}">{{ r.overall_risk_level }}</span>
+            </td>
+            <td><strong>{{ "%.1f"|format(r.overall_risk_score) }}/4</strong></td>
+            <td>
+              <a href="{{ url_for('dashboard', report_id=r.id) }}" class="btn btn-secondary btn-sm">
+                🔍 View Dashboard &amp; Voice
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <p>No medical reports currently assigned to your account.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
