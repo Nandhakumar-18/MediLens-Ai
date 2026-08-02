@@ -52,6 +52,26 @@ class AlertSystem:
             'Moderate': '[WARNING] Blood urea is SLIGHTLY ELEVATED ({value} mg/dL).',
             'High':     '[ALERT] Blood urea is HIGH ({value} mg/dL) - possible kidney impairment.',
         },
+        'mcv': {
+            'Low':      '[ALERT] Mean Cell Volume (MCV) is LOW ({value} fL) - indicates microcytic anaemia or iron deficiency.',
+            'High':     '[WARNING] Mean Cell Volume (MCV) is HIGH ({value} fL) - indicates macrocytic anaemia.',
+        },
+        'mch': {
+            'Low':      '[ALERT] Mean Cell Hemoglobin (MCH) is LOW ({value} pg) - hypochromic red blood cells.',
+            'High':     '[WARNING] Mean Cell Hemoglobin (MCH) is HIGH ({value} pg).',
+        },
+        'mchc': {
+            'Low':      '[ALERT] Mean Cell Hb Concentration (MCHC) is LOW ({value} g/dL) - reduced hemoglobin density.',
+            'High':     '[WARNING] Mean Cell Hb Concentration (MCHC) is HIGH ({value} g/dL).',
+        },
+        'hematocrit': {
+            'Low':      '[WARNING] Hematocrit (PCV) is LOW ({value} %) - decreased red blood cell volume.',
+            'High':     '[WARNING] Hematocrit (PCV) is HIGH ({value} %) - possible dehydration or erythrocytosis.',
+        },
+        'platelets': {
+            'Low':      '[ALERT] Platelet Count is LOW ({value} Thousand/uL) - thrombocytopenia risk.',
+            'High':     '[WARNING] Platelet Count is HIGH ({value} Thousand/uL) - thrombocytosis risk.',
+        },
         'uric_acid': {
             'High': '[WARNING] Uric acid is HIGH ({value} mg/dL) - risk of gout or kidney stones.',
         },

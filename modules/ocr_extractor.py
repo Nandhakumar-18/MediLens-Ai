@@ -24,12 +24,12 @@ class OCRExtractor:
                 r'(\d{2,3})\s*mg[/\\]d[lL].*?(?:glucose|sugar|glyc)',
             ],
             'hemoglobin': [
-                r'(?:haemoglobin|hemoglobin|hgb|hb)[\s:=\-]+(\d+(?:\.\d+)?)',
-                r'\bhb[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:haemoglobin|hemoglobin|hgb|hb)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+                r'\bhb[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
             'cholesterol': [
-                r'(?:total\s*cholesterol|t\.cholesterol|cholesterol\s*total|serum\s*cholesterol)[\s:=\-]+(\d+(?:\.\d+)?)',
-                r'cholesterol[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:total\s*cholesterol|t\.cholesterol|cholesterol\s*total|serum\s*cholesterol)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+                r'cholesterol[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
             'systolic_bp': [
                 r'(?:bp|blood\s*pressure|b\.p\.)[\s:=\-]+(\d{2,3})\s*/\s*\d{2,3}',
@@ -41,20 +41,44 @@ class OCRExtractor:
                 r'diastolic[\s:=\-]+(\d{2,3})',
             ],
             'wbc': [
-                r'(?:wbc|white\s*blood\s*(?:cell|corpuscle)s?|total\s*(?:leuco|leuko)cyte|tlc)[\s:=\-]+(\d[\d,]*(?:\.\d+)?)',
-                r'leukocytes?[\s:=\-]+(\d[\d,]*(?:\.\d+)?)',
+                r'(?:white\s*blood\s*cell\s*count|wbc|white\s*blood\s*(?:cell|corpuscle)s?|total\s*(?:leuco|leuko)cyte|tlc)[\s:=\-\s]+(\d[\d,]*(?:\.\d+)?)',
+                r'leukocytes?[\s:=\-\s]+(\d[\d,]*(?:\.\d+)?)',
             ],
             'rbc': [
-                r'(?:rbc|red\s*blood\s*(?:cell|corpuscle)s?|erythrocytes?)[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:r\s*b\s*c\s*count|rbc\s*count|rbc|red\s*blood\s*(?:cell|corpuscle)s?|erythrocytes?)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'mcv': [
+                r'(?:mean\s*cell\s*volume|mcv)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'mch': [
+                r'(?:mean\s*cell\s*hemoglobin|mean\s*cell\s*haemoglobin|mch)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'mchc': [
+                r'(?:mean\s*cell\s*hb\s*concentration|mean\s*cell\s*haemoglobin\s*concentration|mchc)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'hematocrit': [
+                r'(?:hematocrit|haematocrit|pcv)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'platelets': [
+                r'(?:platelet\s*count|platelets|plt)[\s:=\-\s]+(\d[\d,]*(?:\.\d+)?)',
+            ],
+            'lymphocytes': [
+                r'(?:lymphocytes|lymph)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'rdw_sd': [
+                r'(?:rdw\s*sd|rdw\-sd)[\s:=\-\s]+(\d+(?:\.\d+)?)',
+            ],
+            'rdw_cv': [
+                r'(?:rdw\s*cv|rdw\-cv)[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
             'creatinine': [
-                r'(?:s\.?\s*creatinine|serum\s*creatinine|creat(?:inine)?)[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:s\.?\s*creatinine|serum\s*creatinine|creat(?:inine)?)[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
             'urea': [
-                r'(?:blood\s*urea\s*nitrogen|bun|blood\s*urea|urea)[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:blood\s*urea\s*nitrogen|bun|blood\s*urea|urea)[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
             'uric_acid': [
-                r'(?:uric\s*acid|s\.?\s*uric\s*acid|serum\s*uric)[\s:=\-]+(\d+(?:\.\d+)?)',
+                r'(?:uric\s*acid|s\.?\s*uric\s*acid|serum\s*uric)[\s:=\-\s]+(\d+(?:\.\d+)?)',
             ],
         }
 
