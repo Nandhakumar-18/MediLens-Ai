@@ -428,9 +428,10 @@ def reports():
 @app.route('/alerts')
 @login_required
 def alerts_page():
-    all_alerts  = db.get_all_alerts()
-    unread      = db.get_unread_alert_count()
-    db.mark_all_alerts_read()
+    user_id     = session.get('user_id') if session.get('role') not in ('doctor', 'admin') else None
+    all_alerts  = db.get_all_alerts(user_id=user_id)
+    unread      = db.get_unread_alert_count(user_id=user_id)
+    db.mark_all_alerts_read(user_id=user_id)
     return render_template('alerts.html', alerts=all_alerts, unread_count=unread)
 
 
@@ -510,7 +511,8 @@ def api_dismiss_alert(alert_id):
 @app.route('/api/unread-alerts')
 @login_required
 def api_unread_alerts():
-    return jsonify({'count': db.get_unread_alert_count()})
+    user_id = session.get('user_id') if session.get('role') not in ('doctor', 'admin') else None
+    return jsonify({'count': db.get_unread_alert_count(user_id=user_id)})
 
 
 @app.route('/api/health-trends')

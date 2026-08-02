@@ -188,3 +188,64 @@ function formatBytes(bytes) {
   if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / 1048576).toFixed(1) + ' MB';
 }
+
+// ─── PWA Service Worker & "Add to Home Screen" Install Manager ───────────
+let deferredInstallPrompt = null;
+
+function initPWA() {
+  // Register Service Worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/sw.js')
+      .then(() => console.log('✓ Service Worker Registered'))
+      .catch(() => {});
+  }
+
+  const sidebarBtn     = document.getElementById('pwa-install-btn');
+  const banner         = document.getElementById('pwa-install-banner');
+  const bannerInstBtn  = document.getElementById('pwa-banner-install-btn');
+  const bannerCloseBtn = document.getElementById('pwa-banner-close-btn');
+
+  // Catch native browser install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+
+    // Show sidebar button & pop-up banner if not previously dismissed
+    if (sidebarBtn) sidebarBtn.style.display = 'inline-flex';
+    
+    if (!localStorage.getItem('pwa_banner_dismissed')) {
+      setTimeout(() => {
+        if (banner) banner.style.display = 'block';
+      }, 1500);
+    }
+  });
+
+  const triggerInstall = () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      deferredInstallPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          if (banner) banner.style.display = 'none';
+          if (sidebarBtn) sidebarBtn.style.display = 'none';
+        }
+        deferredInstallPrompt = null;
+      });
+    } else {
+      showToast('To add MediLensAI to your Home Screen: open browser menu ⋮ and select "Add to Home screen" or "Install App".', 'success');
+    }
+  };
+
+  if (sidebarBtn)    sidebarBtn.addEventListener('click', triggerInstall);
+  if (bannerInstBtn) bannerInstBtn.addEventListener('click', triggerInstall);
+
+  if (bannerCloseBtn) {
+    bannerCloseBtn.addEventListener('click', () => {
+      if (banner) banner.style.display = 'none';
+      localStorage.setItem('pwa_banner_dismissed', 'true');
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initPWA();
+});

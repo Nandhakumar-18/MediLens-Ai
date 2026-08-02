@@ -327,28 +327,50 @@ class Database:
         conn.close()
         return [dict(r) for r in rows]
 
-    def get_all_alerts(self):
+    def get_all_alerts(self, user_id=None):
         conn = self.get_connection()
-        rows = conn.execute(
-            '''SELECT a.*, r.patient_name FROM alerts a
-               JOIN reports r ON a.report_id = r.id
-               WHERE a.is_dismissed=0
-               ORDER BY a.timestamp DESC'''
-        ).fetchall()
+        if user_id is not None:
+            rows = conn.execute(
+                '''SELECT a.*, r.patient_name FROM alerts a
+                   JOIN reports r ON a.report_id = r.id
+                   WHERE a.is_dismissed=0 AND r.user_id=?
+                   ORDER BY a.timestamp DESC''', (user_id,)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                '''SELECT a.*, r.patient_name FROM alerts a
+                   JOIN reports r ON a.report_id = r.id
+                   WHERE a.is_dismissed=0
+                   ORDER BY a.timestamp DESC'''
+            ).fetchall()
         conn.close()
         return [dict(r) for r in rows]
 
-    def get_unread_alert_count(self):
+    def get_unread_alert_count(self, user_id=None):
         conn = self.get_connection()
-        count = conn.execute(
-            'SELECT COUNT(*) FROM alerts WHERE is_read=0 AND is_dismissed=0'
-        ).fetchone()[0]
+        if user_id is not None:
+            count = conn.execute(
+                '''SELECT COUNT(*) FROM alerts a
+                   JOIN reports r ON a.report_id = r.id
+                   WHERE a.is_read=0 AND a.is_dismissed=0 AND r.user_id=?''', (user_id,)
+            ).fetchone()[0]
+        else:
+            count = conn.execute(
+                'SELECT COUNT(*) FROM alerts WHERE is_read=0 AND is_dismissed=0'
+            ).fetchone()[0]
         conn.close()
         return count
 
-    def mark_all_alerts_read(self):
+    def mark_all_alerts_read(self, user_id=None):
         conn = self.get_connection()
-        conn.execute('UPDATE alerts SET is_read=1')
+        if user_id is not None:
+            conn.execute(
+                '''UPDATE alerts SET is_read=1 WHERE id IN (
+                       SELECT a.id FROM alerts a JOIN reports r ON a.report_id = r.id WHERE r.user_id=?
+                   )''', (user_id,)
+            )
+        else:
+            conn.execute('UPDATE alerts SET is_read=1')
         conn.commit()
         conn.close()
 
