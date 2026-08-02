@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Offline Mode — MediLensAI</title>
+  <link rel="stylesheet" href="/static/css/style.css"/>
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#0f172a"/>
+</head>
+<body style="background: var(--bg-deep); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px;">
+
+  <div class="card fade-in" style="max-width: 500px; width: 100%; text-align: center; border-color: var(--cyan); box-shadow: var(--glow-cyan);">
+    <div style="font-size: 64px; margin-bottom: 16px;">📴</div>
+    <h1 style="font-size: 24px; font-weight: 800; color: var(--cyan); margin-bottom: 8px;">MediLensAI Offline Mode</h1>
+    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6;">
+      You are currently offline. MediLensAI is engineered for 100% offline edge processing!
+    </p>
+
+    <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; text-align: left; margin-bottom: 24px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+        <span>💡</span> How to use MediLensAI 100% Offline:
+      </h3>
+      <ul style="font-size: 13px; color: var(--text-secondary); line-height: 1.8; list-style: none;">
+        <li>✅ <strong>Cached Pages:</strong> All previously visited reports and dashboards remain cached and readable offline.</li>
+        <li>⚡ <strong>Local Laptop Server:</strong> Run <code>py app.py</code> on your laptop or local Wi-Fi router (<code>http://&lt;your-ip&gt;:5000</code>).</li>
+        <li>📱 <strong>Mobile Offline Access:</strong> Connect your phone to your laptop's Wi-Fi hotspot to access full offline AI diagnostics without internet!</li>
+      </ul>
+    </div>
+
+    <button onclick="window.location.reload()" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+      🔄 Retry Connection
+    </button>
+  </div>
+
+</body>
+</html>

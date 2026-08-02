@@ -299,6 +299,11 @@ def logout():
     return redirect(url_for('login'))
 
 
+@app.route('/offline')
+def offline():
+    return render_template('offline.html')
+
+
 # ─── Application Routes ───────────────────────────────────────────────────────
 
 @app.route('/')
