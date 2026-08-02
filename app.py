@@ -112,15 +112,19 @@ def request_sms_otp():
     from datetime import datetime, timedelta
     
     data          = request.get_json() or {}
-    mobile_input  = data.get('mobile_number', '').strip()
-    clean_mobile  = ''.join(filter(str.isdigit, mobile_input))
-
-    if not clean_mobile or len(clean_mobile) < 10:
-        return jsonify({'success': False, 'message': 'Please enter a valid 10-digit mobile number.'}), 400
-
-    user = db.get_user_by_mobile(clean_mobile)
+    user = None
+    clean_mobile = ''.join(filter(str.isdigit, mobile_input))
+    
+    if len(clean_mobile) >= 10:
+        user = db.get_user_by_mobile(clean_mobile)
+    
     if not user:
-        return jsonify({'success': False, 'message': 'No registered account found with this mobile number.'}), 404
+        user = db.get_user_by_username(mobile_input)
+        if user and user.get('mobile_number'):
+            clean_mobile = ''.join(filter(str.isdigit, user['mobile_number']))
+
+    if not user or not clean_mobile or len(clean_mobile) < 10:
+        return jsonify({'success': False, 'message': 'No registered account or valid mobile number found for this input.'}), 404
 
     # Generate 6-digit OTP
     otp_code = f"{random.randint(100000, 999999)}"

@@ -284,7 +284,7 @@ let resetTargetMobile = '';
 function sendMobileOTP() {
   const mobileInput = document.getElementById('reset-mobile-input').value.trim();
   if (!mobileInput) {
-    showModalAlert('Please enter your registered 10-digit mobile number.', 'danger');
+    showModalAlert('Please enter your registered Username or 10-digit Mobile Number.', 'danger');
     return;
   }
 
@@ -293,29 +293,30 @@ function sendMobileOTP() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mobile_number: mobileInput })
   })
-  .then(r => r.json())
-  .then(data => {
-    if (data.success) {
+  .then(r => r.json().then(data => ({ status: r.status, body: data })))
+  .then(res => {
+    const data = res.body;
+    if (res.status === 200 && data.success) {
       resetTargetMobile = data.mobile;
       document.getElementById('step-1-container').style.display = 'none';
       document.getElementById('step-2-container').style.display = 'block';
       
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      const textPreview = `Security OTP Code: [ ${data.otp} ] sent to +91 ${data.mobile}`;
+      const textPreview = `Security OTP sent to registered mobile: +91 ${data.mobile}`;
       document.getElementById('sms-text-preview').textContent = textPreview;
       
       const actionContainer = document.getElementById('sms-action-btn');
       if (isMobile) {
         actionContainer.innerHTML = `<a href="${data.sms_uri}" class="btn btn-secondary btn-sm" style="width:100%; justify-content:center; padding:6px; font-size:11px;">📱 Send Text via Native Device SIM</a>`;
       } else {
-        actionContainer.innerHTML = `<small style="color:var(--cyan); font-weight:600;">(OTP Auto-Filled for Testing: ${data.otp})</small>`;
+        actionContainer.innerHTML = `<small style="color:var(--text-muted); font-size:11px;">Enter the 6-digit OTP code received on your mobile device below.</small>`;
       }
       
-      // Pre-fill OTP field for convenient testing
-      document.getElementById('reset-otp-input').value = data.otp;
+      // Ensure OTP input field is 100% EMPTY so user must enter it
+      document.getElementById('reset-otp-input').value = '';
       showModalAlert(data.message, 'success');
     } else {
-      showModalAlert(data.message, 'danger');
+      showModalAlert(data.message || 'Account or mobile number not found.', 'danger');
     }
   })
   .catch(err => {
