@@ -1,5 +1,7 @@
-const CACHE_NAME = 'medilensai-offline-v2';
+const CACHE_NAME = 'medilensai-offline-v3';
 const STATIC_ASSETS = [
+  '/',
+  '/login',
   '/offline',
   '/static/css/style.css',
   '/static/js/main.js',
