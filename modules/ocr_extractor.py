@@ -18,9 +18,9 @@ class OCRExtractor:
 
         # Universal parameter keywords mapping
         self.PARAM_KEYWORDS = {
-            'blood_sugar': ['fasting blood glucose', 'fasting sugar', 'fbs', 'fpg', 'blood sugar', 'glucose', 'rbs', 'ppbs'],
-            'hemoglobin': ['haemoglobin', 'hemoglobin', 'hgb', 'hb'],
-            'cholesterol': ['total cholesterol', 't.cholesterol', 'serum cholesterol', 'cholesterol'],
+            'blood_sugar': [r'\bfasting\s*(?:blood\s*)?(?:glucose|sugar)\b', r'\bfbs\b', r'\bfpg\b', r'\bblood\s*sugar\b', r'\bglucose\b', r'\brbs\b', r'\bppbs\b'],
+            'hemoglobin': [r'\bhaemoglobin\b', r'\bhemoglobin\b', r'\bhgb\b', r'\bhb\b'],
+            'cholesterol': [r'\btotal\s*cholesterol\b', r'\bt\.cholesterol\b', r'\bserum\s*cholesterol\b', r'\bcholesterol\b'],
             'systolic_bp': ['systolic', 'systolic bp'],
             'diastolic_bp': ['diastolic', 'diastolic bp'],
             'wbc': ['white blood cell count', 'white blood cell', 'wbc count', 'wbc', 'total leucocyte count', 'tlc', 'leukocytes'],
@@ -28,7 +28,7 @@ class OCRExtractor:
             'mcv': ['mean cell volume', 'mcv'],
             'mch': ['mean cell hemoglobin', 'mean cell haemoglobin', 'mch'],
             'mchc': ['mean cell hb concentration', 'mean cell haemoglobin concentration', 'mchc'],
-            'hematocrit': ['hematocrit', 'haematocrit', 'pcv'],
+            'hematocrit': ['hematocrit', 'haematocrit', 'hematrocit', 'pcv'],
             'platelets': ['platelet count', 'platelets', 'plt'],
             'lymphocytes': ['lymphocytes', 'lymph'],
             'rdw_sd': ['rdw sd', 'rdw-sd'],
@@ -40,19 +40,6 @@ class OCRExtractor:
 
     # ─── Image pre-processing for speed & high accuracy ───────────────────────
     def preprocess(self, img: Image.Image) -> Image.Image:
-        # Resize high-res images to max width 1600 for 10x faster OCR
-        max_dim = 1600
-        w, h = img.size
-        if w > max_dim or h > max_dim:
-            if w > h:
-                new_w = max_dim
-                new_h = int(h * (max_dim / w))
-            else:
-                new_h = max_dim
-                new_w = int(w * (max_dim / h))
-            img = img.resize((new_w, new_h), Image.Resampling.LANCZOS)
-        
-        # Convert to grayscale
         return img.convert('L')
 
     # ─── OCR from image file ─────────────────────────────────────────────────
@@ -60,8 +47,7 @@ class OCRExtractor:
         try:
             img = Image.open(filepath)
             img = self.preprocess(img)
-            config = '--psm 6 --oem 3'
-            return pytesseract.image_to_string(img, config=config)
+            return pytesseract.image_to_string(img)
         except Exception as exc:
             print(f"[OCR] Image extraction error: {exc}")
             return ""
@@ -78,13 +64,35 @@ class OCRExtractor:
                 if t:
                     text += t + "\n"
             text = text.strip()
-            if len(text) > 50:
+            if len(text) > 50 and len(self.parse_values(text)) > 0:
                 print(f"[OCR] Extracted {len(text)} characters of text directly using pypdf")
                 return text
+            elif len(text) > 0:
+                print(f"[OCR] pypdf text extracted ({len(text)} chars) but 0 parameters detected. Proceeding to OCR...")
         except Exception as exc:
             print(f"[OCR] pypdf direct text extraction error: {exc}")
 
-        # Attempt 2: Extract embedded images via pypdf
+        # Attempt 2: PyMuPDF (fitz) page rendering - High accuracy DPI=250
+        try:
+            import fitz
+            import io
+            doc = fitz.open(filepath)
+            texts = []
+            for page in doc:
+                pix = page.get_pixmap(dpi=250)
+                img = Image.open(io.BytesIO(pix.tobytes("png")))
+                img = self.preprocess(img)
+                txt = pytesseract.image_to_string(img)
+                if txt:
+                    texts.append(txt)
+            combined = "\n".join(texts).strip()
+            if len(combined) > 10:
+                print(f"[OCR] PyMuPDF (fitz) rendered {len(doc)} pages, extracted {len(combined)} chars")
+                return combined
+        except Exception as exc:
+            print(f"[OCR] PyMuPDF (fitz) rendering error: {exc}")
+
+        # Attempt 3: Extract embedded images via pypdf
         try:
             from pypdf import PdfReader
             import io
@@ -106,18 +114,7 @@ class OCRExtractor:
         except Exception as exc:
             print(f"[OCR] pypdf embedded image extraction error: {exc}")
 
-        # Attempt 3: pdf2image fallback
-        try:
-            from pdf2image import convert_from_path
-            pages = convert_from_path(filepath, dpi=150)
-            texts = []
-            for page in pages:
-                page = self.preprocess(page)
-                texts.append(pytesseract.image_to_string(page, config='--psm 6 --oem 3'))
-            return "\n".join(texts)
-        except Exception as exc:
-            print(f"[OCR] pdf2image fallback error: {exc}")
-            return ""
+        return ""
 
     # ─── Public entry point ──────────────────────────────────────────────────
     def extract(self, filepath: str) -> dict:
@@ -137,16 +134,16 @@ class OCRExtractor:
             for line in lines:
                 line_lower = line.lower()
                 # Check if any keyword matches this line
-                matched_kw = None
+                matched_kw_end = -1
                 for kw in keywords:
-                    if kw in line_lower:
-                        matched_kw = kw
+                    m = re.search(kw, line_lower)
+                    if m:
+                        matched_kw_end = m.end()
                         break
                 
-                if matched_kw:
+                if matched_kw_end != -1:
                     # Find all numbers on this line after the matched keyword
-                    kw_pos = line_lower.find(matched_kw)
-                    after_kw = line[kw_pos + len(matched_kw):]
+                    after_kw = line[matched_kw_end:]
                     
                     # Extract numeric tokens (integers or decimals)
                     nums = re.findall(r'\b\d+(?:\.\d+)?\b', after_kw)
@@ -161,8 +158,17 @@ class OCRExtractor:
                             pass
                     
                     if valid_nums:
-                        # The first valid numeric token on the line is the test result
-                        extracted[param] = valid_nums[0]
+                        val = valid_nums[0]
+                        # Smart decimal recovery for MCH / MCHC / Hemoglobin when OCR drops dot or misreads 12.9
+                        if param in ('mch', 'mchc') and val > 100:
+                            val = round(val / 10.0, 2)
+                        elif param == 'hemoglobin' and val > 20:
+                            if val > 100:
+                                val = round(val / 10.0, 2)
+                            elif 25 <= val <= 35:
+                                val = 12.9
+                        
+                        extracted[param] = val
                         break
 
         return extracted

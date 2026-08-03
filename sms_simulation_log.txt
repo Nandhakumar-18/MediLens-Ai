@@ -202,3 +202,120 @@ MSG: [ALERT] Creatinine is HIGH (2.3 mg/dL) - possible kidney dysfunction.
 TO: Patient Contact
 MSG: [WARNING] Uric acid is HIGH (9.8 mg/dL) - risk of gout or kidney stones.
 
+
+--- SMS Batch - 2026-08-02 20:39:40 ---
+TO: Patient Contact
+MSG: [CRITICAL] Blood sugar is dangerously high (245.0 mg/dL). Emergency care needed!
+
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+
+--- SMS Batch - 2026-08-02 20:41:20 ---
+TO: Patient Contact
+MSG: [CRITICAL] Blood sugar is dangerously high (245.0 mg/dL). Emergency care needed!
+
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (8.1 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Cholesterol is HIGH (285.0 mg/dL) - cardiovascular risk elevated.
+
+
+--- SMS Batch - 2026-08-02 20:45:02 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [WARNING] Mean Cell Hemoglobin (MCH) is HIGH (239.0 pg).
+
+TO: Patient Contact
+MSG: [WARNING] Mean Cell Hb Concentration (MCHC) is HIGH (318.0 g/dL).
+
+
+--- SMS Batch - 2026-08-02 20:45:58 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
+
+--- SMS Batch - 2026-08-02 20:47:13 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
+
+--- SMS Batch - 2026-08-02 20:47:50 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
+
+--- SMS Batch - 2026-08-02 20:48:26 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
+
+--- SMS Batch - 2026-08-03 14:18:50 ---
+TO: Patient Contact
+MSG: [ALERT] Hemoglobin is LOW (29.0 g/dL) - anaemia detected. See a doctor.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
+
+--- SMS Batch - 2026-08-03 14:22:54 ---
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Volume (MCV) is LOW (75.2 fL) - indicates microcytic anaemia or iron deficiency.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hemoglobin (MCH) is LOW (23.9 pg) - hypochromic red blood cells.
+
+TO: Patient Contact
+MSG: [ALERT] Mean Cell Hb Concentration (MCHC) is LOW (31.8 g/dL) - reduced hemoglobin density.
+
