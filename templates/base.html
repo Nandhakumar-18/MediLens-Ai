@@ -39,7 +39,10 @@
   {% endwith %}
 </div>
 
+{% set is_login = (request.endpoint == 'login') %}
+
 <!-- ── Mobile Top Header Bar (Visible on mobile screens) ──────────────────── -->
+{% if not is_login %}
 <header class="mobile-top-bar">
   <div class="mobile-nav-top">
     <div style="display: flex; align-items: center; gap: 8px;">
@@ -72,10 +75,12 @@
     <a href="{{ url_for('alerts_page') }}" class="mobile-nav-item">🔔 Alerts</a>
   </nav>
 </header>
+{% endif %}
 
 <!-- ── Layout ────────────────────────────────────────────────────────────── -->
 <div class="layout">
 
+  {% if not is_login %}
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
@@ -130,9 +135,10 @@
       </button>
     </div>
   </aside>
+  {% endif %}
 
   <!-- Main -->
-  <main class="main-content">
+  <main class="main-content" {% if is_login %}style="margin-left:0 !important; width:100% !important; max-width:100% !important; padding: 20px 10px;"{% endif %}>
     {% block content %}{% endblock %}
   </main>
 

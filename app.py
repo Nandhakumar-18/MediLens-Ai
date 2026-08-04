@@ -373,7 +373,7 @@ def upload():
     else:
         # 🧪 Lab Report OCR Pipeline
         extracted    = ocr.extract(filepath)
-        risk_results = predictor.predict(extracted)
+        risk_results = predictor.predict(extracted, gender=patient_gender)
         overall_level, overall_score = predictor.overall_risk(risk_results)
 
     report_id = db.save_report(

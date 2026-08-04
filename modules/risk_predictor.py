@@ -239,16 +239,53 @@ class RiskPredictor:
         },
     }
 
-    def _classify(self, param_name: str, value: float):
-        ranges = self.PARAMETERS[param_name]['ranges']
+    def get_gender_info(self, name: str, gender: str) -> dict:
+        info = dict(self.PARAMETERS[name])
+        g = str(gender).strip().lower()
+        if g in ('male', 'm'):
+            if name == 'hemoglobin':
+                info['normal_min'], info['normal_max'] = 13.5, 17.5
+                info['ranges'] = [(0, 8.0, 'Critical Low', 4), (8.0, 11.0, 'Low', 3), (11.0, 13.5, 'Low', 2), (13.5, 17.5, 'Normal', 0), (17.5, float('inf'), 'High', 2)]
+            elif name == 'rbc':
+                info['normal_min'], info['normal_max'] = 4.5, 5.9
+                info['ranges'] = [(0, 3.8, 'Low', 3), (3.8, 4.5, 'Low', 2), (4.5, 5.9, 'Normal', 0), (5.9, float('inf'), 'High', 2)]
+            elif name == 'hematocrit':
+                info['normal_min'], info['normal_max'] = 41.0, 50.0
+                info['ranges'] = [(0, 41.0, 'Low', 2), (41.0, 50.0, 'Normal', 0), (50.0, float('inf'), 'High', 2)]
+            elif name == 'creatinine':
+                info['normal_min'], info['normal_max'] = 0.7, 1.3
+                info['ranges'] = [(0, 0.7, 'Low', 1), (0.7, 1.3, 'Normal', 0), (1.3, 1.8, 'Moderate', 2), (1.8, 3.0, 'High', 3), (3.0, float('inf'), 'Critical', 4)]
+            elif name == 'uric_acid':
+                info['normal_min'], info['normal_max'] = 3.4, 7.0
+                info['ranges'] = [(0, 3.4, 'Low', 1), (3.4, 7.0, 'Normal', 0), (7.0, float('inf'), 'High', 3)]
+        elif g in ('female', 'f'):
+            if name == 'hemoglobin':
+                info['normal_min'], info['normal_max'] = 12.0, 15.5
+                info['ranges'] = [(0, 8.0, 'Critical Low', 4), (8.0, 10.0, 'Low', 3), (10.0, 12.0, 'Low', 2), (12.0, 15.5, 'Normal', 0), (15.5, float('inf'), 'High', 2)]
+            elif name == 'rbc':
+                info['normal_min'], info['normal_max'] = 4.1, 5.1
+                info['ranges'] = [(0, 3.5, 'Low', 3), (3.5, 4.1, 'Low', 2), (4.1, 5.1, 'Normal', 0), (5.1, float('inf'), 'High', 2)]
+            elif name == 'hematocrit':
+                info['normal_min'], info['normal_max'] = 36.0, 46.0
+                info['ranges'] = [(0, 36.0, 'Low', 2), (36.0, 46.0, 'Normal', 0), (46.0, float('inf'), 'High', 2)]
+            elif name == 'creatinine':
+                info['normal_min'], info['normal_max'] = 0.55, 1.02
+                info['ranges'] = [(0, 0.55, 'Low', 1), (0.55, 1.02, 'Normal', 0), (1.02, 1.5, 'Moderate', 2), (1.5, 2.5, 'High', 3), (2.5, float('inf'), 'Critical', 4)]
+            elif name == 'uric_acid':
+                info['normal_min'], info['normal_max'] = 2.4, 6.0
+                info['ranges'] = [(0, 2.4, 'Low', 1), (2.4, 6.0, 'Normal', 0), (6.0, float('inf'), 'High', 3)]
+        return info
+
+    def _classify_custom(self, ranges: list, value: float):
         for lo, hi, level, score in ranges:
             if lo <= value < hi:
                 return level, score
         return 'Unknown', 0
 
-    def predict(self, extracted: dict) -> list:
+    def predict(self, extracted: dict, gender: str = 'Unknown') -> list:
         results = []
-        for name, info in self.PARAMETERS.items():
+        for name in self.PARAMETERS.keys():
+            info  = self.get_gender_info(name, gender)
             value = extracted.get(name)
             entry = {
                 'name': name,
@@ -262,7 +299,7 @@ class RiskPredictor:
                 'risk_score': 0,
             }
             if value is not None:
-                level, score = self._classify(name, value)
+                level, score = self._classify_custom(info['ranges'], value)
                 entry['risk_level'] = level
                 entry['risk_score'] = score
             results.append(entry)

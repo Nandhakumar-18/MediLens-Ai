@@ -125,6 +125,95 @@
   </form>
 </div>
 
+<!-- ── Interactive BMI Calculator ─────────────────────────────────────────── -->
+<div class="card fade-in" style="max-width:780px; margin: 0 auto 40px;">
+  <h2 class="section-title">⚖️ Interactive Offline BMI Calculator</h2>
+  <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;">
+    Calculate Body Mass Index (BMI) and view ideal clinical weight ranges for your height.
+  </p>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 20px;">
+    <div>
+      <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Height (cm)</label>
+      <input type="number" id="bmi-height" placeholder="e.g. 170" value="170" min="50" max="250"
+             oninput="calculateBMI()" style="width:100%; padding:10px; border-radius:var(--radius-md); background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; font-size:14px; outline:none;"/>
+    </div>
+    <div>
+      <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Weight (kg)</label>
+      <input type="number" id="bmi-weight" placeholder="e.g. 68" value="68" min="20" max="300"
+             oninput="calculateBMI()" style="width:100%; padding:10px; border-radius:var(--radius-md); background:rgba(255,255,255,0.05); border:1px solid var(--border); color:#fff; font-size:14px; outline:none;"/>
+    </div>
+    <div>
+      <label style="display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">Gender</label>
+      <select id="bmi-gender" onchange="calculateBMI()" style="width:100%; padding:10px; border-radius:var(--radius-md); background:var(--bg-deep); border:1px solid var(--border); color:#fff; font-size:14px; outline:none;">
+        <option value="Male">Male ♂</option>
+        <option value="Female">Female ♀</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="bmi-result-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Body Mass Index</div>
+      <div style="display: flex; align-items: baseline; gap: 8px;">
+        <span id="bmi-val-text" style="font-size: 32px; font-weight: 800; color: var(--cyan);">23.5</span>
+        <span style="font-size: 14px; color: var(--text-secondary);">kg/m²</span>
+      </div>
+    </div>
+
+    <div>
+      <span id="bmi-badge" class="badge badge-normal" style="font-size: 13px; padding: 6px 14px;">Normal Weight</span>
+    </div>
+
+    <div style="flex: 1; min-width: 200px;">
+      <div id="bmi-ideal-text" style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">
+        Target Ideal Weight Range: <strong>53.5 – 72.0 kg</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function calculateBMI() {
+  const h = parseFloat(document.getElementById('bmi-height').value) || 0;
+  const w = parseFloat(document.getElementById('bmi-weight').value) || 0;
+  const valEl = document.getElementById('bmi-val-text');
+  const badgeEl = document.getElementById('bmi-badge');
+  const idealEl = document.getElementById('bmi-ideal-text');
+
+  if (h <= 0 || w <= 0) {
+    valEl.textContent = '--';
+    badgeEl.textContent = 'Invalid Input';
+    return;
+  }
+
+  const hMeters = h / 100.0;
+  const bmi = w / (hMeters * hMeters);
+  const bmiRounded = bmi.toFixed(1);
+
+  valEl.textContent = bmiRounded;
+
+  const minWeight = (18.5 * hMeters * hMeters).toFixed(1);
+  const maxWeight = (24.9 * hMeters * hMeters).toFixed(1);
+  idealEl.innerHTML = `Target Ideal Weight Range for ${h} cm: <strong>${minWeight} – ${maxWeight} kg</strong>`;
+
+  if (bmi < 18.5) {
+    badgeEl.className = 'badge badge-moderate';
+    badgeEl.textContent = 'Underweight (< 18.5)';
+  } else if (bmi <= 24.9) {
+    badgeEl.className = 'badge badge-normal';
+    badgeEl.textContent = 'Normal Weight (18.5 – 24.9)';
+  } else if (bmi <= 29.9) {
+    badgeEl.className = 'badge badge-high';
+    badgeEl.textContent = 'Overweight (25.0 – 29.9)';
+  } else {
+    badgeEl.className = 'badge badge-critical';
+    badgeEl.textContent = 'Obese (≥ 30.0)';
+  }
+}
+document.addEventListener('DOMContentLoaded', calculateBMI);
+</script>
+
 <!-- ── How it works ───────────────────────────────────────────────────────── -->
 <div class="card fade-in" style="margin-bottom:40px;">
   <h2 class="section-title">⚙️ How It Works</h2>
