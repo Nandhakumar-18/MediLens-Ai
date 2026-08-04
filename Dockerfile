@@ -15,15 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
-# Install Python dependencies
-RUN pip install --no-cache-dir \
-    flask==3.0.3 \
-    pytesseract==0.3.10 \
-    Pillow==10.3.0 \
-    pypdf==4.2.0 \
-    fpdf2==2.7.9 \
-    waitress==3.0.0 \
-    qrcode==7.4.2
+# Copy requirements and install Python dependencies
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application source code
 COPY . /app
@@ -31,5 +25,5 @@ COPY . /app
 # Expose port 5000
 EXPOSE 5000
 
-# Start application using Waitress production WSGI server
-CMD ["python", "-c", "from waitress import serve; from app import app, db; db.init_db(); serve(app, host='0.0.0.0', port=5000)"]
+# Start application using Gunicorn WSGI server
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
