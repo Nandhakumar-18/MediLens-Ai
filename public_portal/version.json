@@ -1,0 +1,16 @@
+{
+  "app_name": "MediLensAI",
+  "version": "2.0.0",
+  "release_date": "2026-08-04",
+  "download_urls": {
+    "windows": "https://github.com/Nandhakumar-18/MediLens-Ai/releases/download/v2.0.0/MediLensAI_Setup.exe",
+    "android": "https://github.com/Nandhakumar-18/MediLens-Ai/releases/download/v2.0.0/MediLensAI.apk"
+  },
+  "features": [
+    "100% Offline Standalone Desktop Executable",
+    "Tamper-Proof Read-Only App Package",
+    "Interactive BMI Calculator",
+    "Gender-Specific Reference Ranges",
+    "Full CBC 11 Parameter Extraction"
+  ]
+}
