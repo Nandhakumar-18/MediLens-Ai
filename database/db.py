@@ -16,6 +16,16 @@ class Database:
         conn.execute("PRAGMA foreign_keys = ON")
         return conn
 
+    def verify_integrity(self):
+        try:
+            conn = self.get_connection()
+            result = conn.execute("PRAGMA integrity_check").fetchone()
+            conn.close()
+            return result and result[0] == 'ok'
+        except Exception as e:
+            print(f"[DB TAMPER CHECK] Database verification failed: {e}")
+            return False
+
     def init_db(self):
         conn = self.get_connection()
         cursor = conn.cursor()
